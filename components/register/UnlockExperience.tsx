@@ -13,6 +13,14 @@ export default function UnlockExperience({
 
   // We use 10 tickets for desktop, 6 for mobile
   const [isMobile, setIsMobile] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+
+  const handleClaim = () => {
+    setIsClaiming(true);
+    setTimeout(() => {
+      onBagIt();
+    }, 600);
+  };
 
   const TICKET_DATA = [
     { variant: "group", angle: 0.1 },
@@ -54,7 +62,7 @@ export default function UnlockExperience({
 
     // Create ticket bodies
     // Reduced size and increased count
-    const ticketCount = window.innerWidth < 768 ? 9 : 11;
+    const ticketCount = window.innerWidth < 768 ? 8 : 11;
     const ticketWidth = window.innerWidth < 768 ? 150 : 200;
     const ticketHeight = window.innerWidth < 768 ? 75 : 100;
 
@@ -126,13 +134,13 @@ export default function UnlockExperience({
     };
   }, []);
 
-  const ticketCount = isMobile ? 9 : 11;
+  const ticketCount = isMobile ? 8 : 11;
 
   return (
-    <div ref={sceneRef} className="relative min-h-screen bg-[#0a0a0a] text-[#f4efe6] overflow-hidden font-sans selection:bg-[#2d0f4d] selection:text-white flex flex-col items-center justify-center">
+    <div className="relative min-h-screen bg-[#0a0a0a] text-[#f4efe6] overflow-hidden font-sans selection:bg-[#2d0f4d] selection:text-white flex flex-col items-center justify-center">
 
       {/* Grid details - Top Right */}
-      <div className="absolute top-10 right-10 md:top-20 md:right-20 pointer-events-none text-[#6d28d9] font-mono text-[10px] md:text-xs z-10 flex flex-col items-end gap-1">
+      <div className="absolute top-24 right-6 md:top-20 md:right-20 pointer-events-none text-[#6d28d9] font-mono text-[10px] md:text-xs z-10 flex flex-col items-end gap-1">
         <div className="flex items-center gap-2">
           <span>14/11</span>
           <span className="bg-[#2d0f4d] text-white px-1 font-bold">&gt;</span>
@@ -194,7 +202,7 @@ export default function UnlockExperience({
 
         {/* Ticket Stub Pass Button (Pointer Events Auto to allow clicking) */}
         <button
-          onClick={onBagIt}
+          onClick={handleClaim}
           className="group pointer-events-auto relative z-40 w-72 sm:w-80 h-20 bg-[#2d0f4d] hover:bg-[#381360] text-white border-2 border-white/80 shadow-[6px_6px_0px_#ffffff] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[4px_4px_0px_#ffffff] transition-all duration-200 cursor-pointer select-none flex items-stretch text-left overflow-visible"
         >
           {/* Authentic Ticket Notches on Perforation Line (at 74%) */}
@@ -206,12 +214,12 @@ export default function UnlockExperience({
 
           {/* Hover Effect: Line scanning from left to right */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
-            <div className="absolute top-0 bottom-0 w-[2px] bg-white shadow-[0_0_10px_#ffffff,0_0_20px_#ffffff] -left-4 group-hover:left-[105%] transition-[left] duration-500 ease-out" />
+            <div className={`absolute top-0 bottom-0 w-[2px] bg-white shadow-[0_0_10px_#ffffff,0_0_20px_#ffffff] -left-4 transition-[left] duration-500 ease-out ${isClaiming ? 'left-[105%]' : 'group-hover:left-[105%]'}`} />
           </div>
 
           {/* Hover Effect: Bottom accent line extending from left to right */}
           <div className="absolute bottom-0 left-0 right-0 h-[2px] overflow-hidden pointer-events-none z-20">
-            <div className="h-full w-full bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out shadow-[0_0_6px_#ffffff]" />
+            <div className={`h-full w-full bg-white origin-left transition-transform duration-300 ease-out shadow-[0_0_6px_#ffffff] ${isClaiming ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
           </div>
 
           {/* Main Pass Area (Left 74%) */}
@@ -258,7 +266,7 @@ export default function UnlockExperience({
       </div>
 
       {/* Scattered Tickets Layer */}
-      <div className="absolute top-0 left-0 w-full h-full z-10 overflow-hidden">
+      <div ref={sceneRef} className="absolute top-0 left-0 w-full h-full z-10 overflow-hidden pointer-events-auto">
         {TICKET_DATA.slice(0, ticketCount).map((ticket, i) => (
           <div
             key={i}

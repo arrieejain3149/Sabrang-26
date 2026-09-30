@@ -13,21 +13,35 @@ const STEPS: { id: StepId; name: string }[] = [
 ];
 
 const EVENTS = [
-  { id: "visitor", title: "Visitor Pass", price: 69, isTeam: false, type: "visitor" },
-  { id: "panache", title: "Panache", price: 2999, isTeam: true, type: "generic" },
-  { id: "dance_battle", title: "Dance Battle", price: 2499, isTeam: true, type: "generic" },
-  { id: "bandjam", title: "BANDJAM", price: 1499, isTeam: true, type: "generic" },
-  { id: "bgmi", title: "BGMI TOURNAMENT", price: 499, isTeam: true, type: "bgmi" },
-  { id: "valorant", title: "VALORANT TOURNAMENT", price: 499, isTeam: true, type: "valorant" },
-  { id: "freefire", title: "FREE FIRE TOURNAMENT", price: 499, isTeam: true, type: "freefire" },
-  { id: "versevaad", title: "VERSEVAAD", price: 499, isTeam: false, type: "generic" },
-  { id: "focus", title: "FOCUS", price: 499, isTeam: false, type: "generic" },
-  { id: "dumb_show", title: "DUMB SHOW", price: 499, isTeam: true, type: "generic" },
-  { id: "clay_modelling", title: "CLAY MODELLING", price: 499, isTeam: false, type: "generic" },
-  { id: "echoes_of_noor", title: "ECHOES OF NOOR", price: 499, isTeam: true, type: "generic" },
-  { id: "bidding", title: "BIDDING BEFORE WICKET", price: 1499, isTeam: true, type: "generic" },
-  { id: "courtroom", title: "COURTROOM", price: 1499, isTeam: true, type: "generic" },
-  { id: "art_relay", title: "ART RELAY", price: 1499, isTeam: true, type: "generic" },
+  { id: "visitor", title: "Visitor Pass", price: 69, isTeam: false, type: "visitor", minTeamSize: 1, maxTeamSize: 1 },
+  // Flagship Events - Team
+  { id: "panache", title: "Panache", price: 2999, isTeam: true, type: "generic", minTeamSize: 6, maxTeamSize: 18 },
+  { id: "sync", title: "SYNC", price: 1499, isTeam: true, type: "generic", minTeamSize: 8, maxTeamSize: 25 },
+  { id: "bandjam", title: "Band Jam", price: 1499, isTeam: true, type: "generic", minTeamSize: 4, maxTeamSize: 8 },
+  
+  // Flagship Events - Solo / Duo
+  { id: "step_up", title: "Step Up", price: 499, isTeam: false, type: "generic", minTeamSize: 1, maxTeamSize: 1 },
+  { id: "echoes_of_noor", title: "Echoes of Noor", price: 499, isTeam: true, type: "generic", minTeamSize: 1, maxTeamSize: 2 },
+  { id: "versevaad", title: "Verse Vaad", price: 499, isTeam: true, type: "generic", minTeamSize: 1, maxTeamSize: 2 },
+
+  // Non-Flagship - Esports
+  { id: "bgmi", title: "BGMI", price: 499, isTeam: true, type: "esports", minTeamSize: 4, maxTeamSize: 5 },
+  { id: "freefire", title: "Free Fire", price: 499, isTeam: true, type: "esports", minTeamSize: 4, maxTeamSize: 5 },
+  { id: "valorant", title: "Valorant", price: 499, isTeam: true, type: "esports", minTeamSize: 5, maxTeamSize: 5 },
+
+  // Non-Flagship - Other Events
+  { id: "rang_manch", title: "Rang Manch", price: 1499, isTeam: true, type: "generic", minTeamSize: 8, maxTeamSize: 16 },
+  { id: "courtroom", title: "Court Room", price: 1499, isTeam: true, type: "generic", minTeamSize: 3, maxTeamSize: 4 },
+  { id: "bidding", title: "Bidding Before Wicket", price: 499, isTeam: true, type: "generic", minTeamSize: 3, maxTeamSize: 5 },
+  { id: "dumb_show", title: "Dumb Show", price: 499, isTeam: true, type: "generic", minTeamSize: 3, maxTeamSize: 3 },
+  { id: "vaad_vivaad", title: "Vaad Vivaad", price: 499, isTeam: false, type: "generic", minTeamSize: 1, maxTeamSize: 1 },
+  { id: "face_off", title: "Face Off", price: 499, isTeam: false, type: "generic", minTeamSize: 1, maxTeamSize: 1 },
+
+  // Activities - Gifts & Hampers (No Cash Prize)
+  { id: "anime_quiz", title: "Anime Quiz", price: 199, isTeam: false, type: "generic", minTeamSize: 1, maxTeamSize: 1 },
+  { id: "art_relay", title: "Art Relay", price: 199, isTeam: false, type: "generic", minTeamSize: 1, maxTeamSize: 1 },
+  { id: "clay_modelling", title: "Clay Modelling", price: 199, isTeam: false, type: "generic", minTeamSize: 1, maxTeamSize: 1 },
+  { id: "chai_pe_charcha", title: "Chai Pe Charcha", price: 199, isTeam: false, type: "generic", minTeamSize: 1, maxTeamSize: 1 },
 ];
 
 type TeamMember = {
@@ -375,12 +389,12 @@ export default function CheckoutForm() {
         }
         // Generic team fields
         if (group === 'generic') {
-          const hasTeamEvents = selectedEvents.map(id => EVENTS.find(e => e.id === id)).some(e => e?.type === 'generic' && e?.isTeam);
+          const hasTeamEvents = selectedEvents.map(id => EVENTS.find(e => e.id === id)).some(e => e?.id === group && e?.isTeam);
           if (hasTeamEvents && !getField(group, 'teamName').trim()) return true;
         }
 
         // Team members validation
-        const hasTeamEvents = selectedEvents.map(id => EVENTS.find(e => e.id === id)).some(e => e?.type === group && e?.isTeam);
+        const hasTeamEvents = selectedEvents.map(id => EVENTS.find(e => e.id === id)).some(e => e?.id === group && e?.isTeam);
         if (hasTeamEvents) {
           const members = teamMembers[group] || [];
           const req = getTeamRequirements(group);
@@ -747,7 +761,7 @@ export default function CheckoutForm() {
   };
 
   return (
-    <div ref={formContainerRef} className="w-full max-w-2xl mx-auto p-6 md:p-10 pb-24 md:pb-32 min-h-screen lg:min-h-0 flex flex-col justify-center animate-in fade-in duration-500">
+    <div ref={formContainerRef} className="w-full max-w-2xl mx-auto p-6 pt-24 md:p-10 md:pt-32 lg:pt-10 pb-24 md:pb-32 min-h-screen lg:min-h-0 flex flex-col justify-center animate-in fade-in duration-500">
       
       {/* Header */}
       <div className="mb-8">
@@ -838,121 +852,133 @@ export default function CheckoutForm() {
         <div style={{ display: currentStep === "forms" ? "block" : "none" }}>
           <div className="space-y-6">
             
-            {/* Generic Events Group */}
-            {getActiveGroups().includes('generic') && renderPersonalFields('generic', `Registration for: ${
-              selectedEvents
-                .map(id => EVENTS.find(e => e.id === id))
-                .filter(e => e?.type === 'generic')
-                .map(e => e?.title)
-                .join(', ')
-            }`, selectedEvents.map(id => EVENTS.find(e => e.id === id)).some(e => e?.type === 'generic' && e?.isTeam))}
-
-            {/* BGMI Group */}
-            {getActiveGroups().includes('bgmi') && renderPersonalFields('bgmi', 'BGMI TOURNAMENT', true, (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
-                    <span>Squad Name <span className="text-violet-400">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    value={getField('bgmi', 'teamName')}
-                    onBlur={() => handleBlur(`bgmi_teamName`)}
-                    onChange={(e) => updateField('bgmi', 'teamName', e.target.value)}
-                    className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`bgmi_teamName`] && !getField('bgmi', 'teamName').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
-                    <span>Leader In-Game Name <span className="text-violet-400">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    value={getField('bgmi', 'leaderIgn')}
-                    onBlur={() => handleBlur(`bgmi_leaderIgn`)}
-                    onChange={(e) => updateField('bgmi', 'leaderIgn', e.target.value)}
-                    className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`bgmi_leaderIgn`] && !getField('bgmi', 'leaderIgn').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
-                    <span>Leader UID <span className="text-violet-400">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    value={getField('bgmi', 'leaderUid')}
-                    onBlur={() => handleBlur(`bgmi_leaderUid`)}
-                    onChange={(e) => updateField('bgmi', 'leaderUid', e.target.value)}
-                    className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`bgmi_leaderUid`] && !getField('bgmi', 'leaderUid').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
-                  />
-                </div>
-              </div>
-            ))}
-
-            {/* Valorant Group */}
-            {getActiveGroups().includes('valorant') && renderPersonalFields('valorant', 'VALORANT TOURNAMENT', true, (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
-                    <span>Team Name <span className="text-violet-400">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    value={getField('valorant', 'teamName')}
-                    onBlur={() => handleBlur(`valorant_teamName`)}
-                    onChange={(e) => updateField('valorant', 'teamName', e.target.value)}
-                    className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`valorant_teamName`] && !getField('valorant', 'teamName').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
-                    <span>Leader Riot ID <span className="text-violet-400">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    value={getField('valorant', 'leaderRiotId')}
-                    onBlur={() => handleBlur(`valorant_leaderRiotId`)}
-                    onChange={(e) => updateField('valorant', 'leaderRiotId', e.target.value)}
-                    className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`valorant_leaderRiotId`] && !getField('valorant', 'leaderRiotId').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
-                  />
-                </div>
-              </div>
-            ))}
-
-            {/* Free Fire Group */}
-            {getActiveGroups().includes('freefire') && renderPersonalFields('freefire', 'FREE FIRE TOURNAMENT', true, (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
-                    <span>Team Name <span className="text-violet-400">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    value={getField('freefire', 'teamName')}
-                    onBlur={() => handleBlur(`freefire_teamName`)}
-                    onChange={(e) => updateField('freefire', 'teamName', e.target.value)}
-                    className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`freefire_teamName`] && !getField('freefire', 'teamName').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
-                    <span>Leader UID <span className="text-violet-400">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    value={getField('freefire', 'leaderUid')}
-                    onBlur={() => handleBlur(`freefire_leaderUid`)}
-                    onChange={(e) => updateField('freefire', 'leaderUid', e.target.value)}
-                    className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`freefire_leaderUid`] && !getField('freefire', 'leaderUid').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
-                  />
-                </div>
-              </div>
-            ))}
-
-            {/* Visitor Pass Group */}
-            {getActiveGroups().includes('visitor') && renderPersonalFields('visitor', 'Visitor Pass', false)}
+            {selectedEvents.map(eventId => {
+              const event = EVENTS.find(e => e.id === eventId);
+              if (!event) return null;
+              
+              let specificFields = null;
+              
+              if (event.id === 'bgmi') {
+                specificFields = (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Squad Name <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField('bgmi', 'teamName')}
+                        onBlur={() => handleBlur('bgmi_teamName')}
+                        onChange={(e) => updateField('bgmi', 'teamName', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched['bgmi_teamName'] && !getField('bgmi', 'teamName').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Leader IGN <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField('bgmi', 'leaderIgn')}
+                        onBlur={() => handleBlur('bgmi_leaderIgn')}
+                        onChange={(e) => updateField('bgmi', 'leaderIgn', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched['bgmi_leaderIgn'] && !getField('bgmi', 'leaderIgn').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Leader UID <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField('bgmi', 'leaderUid')}
+                        onBlur={() => handleBlur('bgmi_leaderUid')}
+                        onChange={(e) => updateField('bgmi', 'leaderUid', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched['bgmi_leaderUid'] && !getField('bgmi', 'leaderUid').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                  </div>
+                );
+              } else if (event.id === 'valorant') {
+                specificFields = (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Team Name <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField('valorant', 'teamName')}
+                        onBlur={() => handleBlur('valorant_teamName')}
+                        onChange={(e) => updateField('valorant', 'teamName', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched['valorant_teamName'] && !getField('valorant', 'teamName').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Leader Riot ID <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField('valorant', 'leaderRiotId')}
+                        onBlur={() => handleBlur('valorant_leaderRiotId')}
+                        onChange={(e) => updateField('valorant', 'leaderRiotId', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched['valorant_leaderRiotId'] && !getField('valorant', 'leaderRiotId').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                  </div>
+                );
+              } else if (event.id === 'freefire') {
+                specificFields = (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Team Name <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField('freefire', 'teamName')}
+                        onBlur={() => handleBlur('freefire_teamName')}
+                        onChange={(e) => updateField('freefire', 'teamName', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched['freefire_teamName'] && !getField('freefire', 'teamName').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Leader UID <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField('freefire', 'leaderUid')}
+                        onBlur={() => handleBlur('freefire_leaderUid')}
+                        onChange={(e) => updateField('freefire', 'leaderUid', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched['freefire_leaderUid'] && !getField('freefire', 'leaderUid').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                  </div>
+                );
+              } else if (event.maxTeamSize > 1) {
+                specificFields = (
+                    <div className="space-y-2">
+                      <label className="text-xs font-mono text-white/60 uppercase tracking-widest">
+                        <span>Team Name <span className="text-violet-400">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        value={getField(event.id, 'teamName')}
+                        onBlur={() => handleBlur(`${event.id}_teamName`)}
+                        onChange={(e) => updateField(event.id, 'teamName', e.target.value)}
+                        className={`w-full bg-black/40 border rounded-lg px-4 py-2 text-white focus:outline-none ${touched[`${event.id}_teamName`] && !getField(event.id, 'teamName').trim() ? "border-red-500/50" : "border-white/10 focus:border-violet-500"}`}
+                      />
+                    </div>
+                );
+              }
+              
+              const showTeamFields = event.maxTeamSize > 1;
+              return renderPersonalFields(event.id, `Registration for: ${event.title}`, showTeamFields, specificFields);
+            })}
             
-          </div>
+    </div>
         </div>
 
         {/* STEP 3: REVIEW */}
